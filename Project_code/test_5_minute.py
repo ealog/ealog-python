@@ -341,8 +341,6 @@ def main():
     time.sleep(sleep_time)
 
 
-    
-
 if __name__ == "__main__":
     main()
 
