@@ -1,0 +1,11 @@
+calendar = ADDCOLUMNS(
+    CALENDAR(date(2020,1,1),date(2021,12,31)),
+    "Year",YEAR([Date]),
+    "Quarter",ROUNDUP(MONTH([Date])/3,0),
+    "Month",MONTH([Date]),
+    "Weeknum",weeknum([Date]),
+    "Year_Quarter",year([date])&"Q"&ROUNDUP(MONTH([Date])/3,0),
+    "Year_Month",year([Date])*100+MONTH([Date]),
+    "Year_Weeks",year([Date])*100+weeknum([Date]),
+    "Weeks",WEEKDAY([Date])
+)
