@@ -1,14 +1,41 @@
-import datetime
+from threading import Thread
 
 
-dic = {}
-k = 0
-for i in range(5):
+# _sum = 0
 
 
-    ls = [5,6,7,8]
-    dic[k] = ls
-    k = k+1
+def cal_sum(begin, end):
+    # global _sum
+    _sum = 0
+    for i in range(begin, end + 1):
+        _sum += i
+    return  _sum
 
-print(dic)
+"""重新定义带返回值的线程类"""
 
+class MyThread(Thread):
+    def __init__(self, func, args):
+        super(MyThread, self).__init__()
+        self.func = func
+        self.args = args
+
+    def run(self):
+        self.result = self.func(*self.args)
+
+    def get_result(self):
+        try:
+            return self.result
+        except Exception:
+            return None
+
+if __name__ == '__main__':
+    t1 = MyThread(cal_sum, args=(1, 5))
+    t2 = MyThread(cal_sum, args=(6, 10))
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+    res1 = t1.get_result()
+    res2 = t2.get_result()
+
+    print(res1 + res2)

@@ -48,9 +48,11 @@ ip_addr ="10.10.100.100"
 
 class MyThread(threading.Thread):
     def __init__(self,func,args):
-        super().__init__(self)
+        super(MyThread,self).__init__()
         self.func = func
         self.args = args
+        
+    def run(self):
         self.result = self.func(*self.args)
     
     def get_result(self):
@@ -324,8 +326,10 @@ def main():
 
     threads_len = range(len(uart_inst))
 
+    print("threads_len values are:",threads_len)
+
     for i in threads_len:
-        t = MyThread(data_read,uart_inst[i])
+        t = MyThread(data_read,args=(uart_inst[i],))
         threads.append(t)
 
     for i in threads_len:
@@ -335,7 +339,7 @@ def main():
         threads[i].join()
 
     for i in threads_len:
-        uart_data=threads[i].result()
+        uart_data=threads[i].get_result()
 
     sleep_time = data_write(database_inst,uart_data)
     time.sleep(sleep_time)
