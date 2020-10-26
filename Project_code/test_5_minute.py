@@ -23,7 +23,7 @@ baudrate = 9600
 
 timeout = 1
 
-# 使用字典，定义每个设备的上次数据 key 代表设备地址 values 存储设备上次数据uart_inst
+# 此条定义无意义，使用字典，定义每个设备的上次数据 key 代表设备地址 values 存储设备上次数据uart_inst
 lt_impep={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0}
 
 # 使用字典，存储设备返回数据
@@ -39,7 +39,7 @@ P=[6,7,12,13,14,15,22]
 
 # 定义SQL语句常量
 SQL = "insert into meters_data (meter_addr,get_date_time,get_date,year_quarter,week_count,day_week,cur_year,cur_month,cur_day,cur_hour,cur_minute,H_L_M,Ua,Ub,Uc,Ia,Ib,Ic,Pt,Pa,Pb,Pc,PFt,PFa,PFb,PFc,Freq,ImpEp,ImpEp_increase,ExpEp,Q1Eq,Q2Eq,Q3Eq,Q4Eq,time_stamp) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now())"
-
+SQL1 = "select ImpEp from meters_data order by get_date_time desc limit 1"
 # 定义数据库IP地址
 ip_addr ="10.10.100.100"
 
@@ -239,9 +239,9 @@ def data_write(database_inst,uart_data):
             database_inst['cmd'].executemany(query=SQL,args=uart_data[key])
             
             database_inst['conn'].commit()
-
             
-            lt_impep[uart_data[key]] = uart_data[key][27]
+            print("uart_data values :",uart_data)
+            lt_impep[key] = uart_data[key][0][27]
             print(lt_impep[key])
 
         # 写完数据后，休眠时间。
@@ -254,14 +254,14 @@ def data_write(database_inst,uart_data):
             a = 301-second_now-60
             print("Data get time is:%s" % time_now)
             print("sleep2",a)
-            time.sleep(a)
+            # time.sleep(a)
             return a
 
         else:
             b = 301-second_now
             print("Data get time is:%s" % time_now)
             print("sleep3",b)
-            time.sleep(b)
+            # time.sleep(b)
             return b
 
 
@@ -321,28 +321,28 @@ def main():
     
     uart_inst = connect_uart(modbus_set)
     database_inst = connect_database()
-    
-    threads = []
+    while True:
+        threads = []
 
-    threads_len = range(len(uart_inst))
+        threads_len = range(len(uart_inst))
 
-    print("threads_len values are:",threads_len)
+        print("threads_len values are:",threads_len)
+        
+        for i in threads_len:
+            t = MyThread(data_read,args=(uart_inst[i],))
+            threads.append(t)
 
-    for i in threads_len:
-        t = MyThread(data_read,args=(uart_inst[i],))
-        threads.append(t)
+        for i in threads_len:
+            threads[i].start()
+        
+        for i in threads_len:
+            threads[i].join()
 
-    for i in threads_len:
-        threads[i].start()
-    
-    for i in threads_len:
-        threads[i].join()
+        for i in threads_len:
+            uart_data=threads[i].get_result()
 
-    for i in threads_len:
-        uart_data=threads[i].get_result()
-
-    sleep_time = data_write(database_inst,uart_data)
-    time.sleep(sleep_time)
+        sleep_time = data_write(database_inst,uart_data)
+        time.sleep(sleep_time)
 
 
 if __name__ == "__main__":
