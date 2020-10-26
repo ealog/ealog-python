@@ -11,6 +11,10 @@ import datetime
 
 import threading
 
+import json
+
+
+json_file = 'lt_impep.json'
 
 # 初始睡眠时间
 sleep_time = 0
@@ -24,7 +28,7 @@ baudrate = 9600
 timeout = 1
 
 # 此条定义无意义，使用字典，定义每个设备的上次数据 key 代表设备地址 values 存储设备上次数据uart_inst
-lt_impep={1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0}
+lt_impep={}
 
 # 使用字典，存储设备返回数据
 uart_date={}
@@ -43,7 +47,20 @@ SQL1 = "select ImpEp from meters_data order by get_date_time desc limit 1"
 # 定义数据库IP地址
 ip_addr ="10.10.100.100"
 
-
+# 定义读取/写入json参数文件，当第一启动读取JSON文件内的，
+def json_rw(rw):
+    if rw == 'r':
+        try:
+            with open(json_file,'r') as f:
+                lt_impep = json.loads(f.read())
+        except Exception:
+            print("File not found.")
+    else:
+        try:
+            with open(json_file,'w') as f:
+                f.write(json.dumps(lt_impep))
+        except Exception:
+            print("Write error!")
 # 重新封装threading类，添加return方法，获得返回值。
 
 class MyThread(threading.Thread):
@@ -249,6 +266,10 @@ def data_write(database_inst,uart_data):
         minute_now=datetime.datetime.now().minute
         second_now=datetime.datetime.now().second
 
+        # 调用json_rw()函数进行写入lt_impep数据。
+
+        json_rw('w')
+
         # 判断当前程序运行时间，是否为整点或5的倍数，如果是则用301-当前系统时间秒-60 为下次开始读取数据时间，否则用301-当前系统时间秒为下次读取数据时间。
         if sleep_time == 0 and (minute_now % 5 == 1):
             a = 301-second_now-60
@@ -318,7 +339,7 @@ def connect_database():
         time.sleep(sleep_time)        
     
 def main():
-    
+    json_rw('r')
     uart_inst = connect_uart(modbus_set)
     database_inst = connect_database()
     while True:
