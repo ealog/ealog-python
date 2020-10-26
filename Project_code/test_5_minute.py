@@ -222,7 +222,7 @@ def data_read(inst):
     data_list.append((meter_addr,time_now,cur_date,year_quarter,week_count,day_week,cur_year,cur_month,cur_day,cur_hour,cur_minute,H_L_M,Ua,Ub,Uc,Ia,Ib,Ic,Pt,Pa,Pb,Pc,PFt,PFa,PFb,PFc,Freq,ImpEp,ImpEp_increase,ExpEp,Q1Eq,Q2Eq,Q3Eq,Q4Eq))
 
     # 更新lt_impep[meter_addr]数量为最后一次电量数，为算增加电量数据做准备
-    lt_impep[meter_addr] = ImpEp
+    
 
     meter_data = {meter_addr:data_list}
 
@@ -241,7 +241,7 @@ def data_write(database_inst,uart_data):
             database_inst['conn'].commit()
 
             
-            
+            lt_impep[uart_data[key]] = uart_data[key][27]
             print(lt_impep[key])
 
         # 写完数据后，休眠时间。
