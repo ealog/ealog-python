@@ -53,6 +53,7 @@ def json_rw(rw):
         try:
             with open(json_file,'r') as f:
                 lt_impep = json.loads(f.read())
+                print(lt_impep)
         except Exception:
             print("File not found.")
     else:
