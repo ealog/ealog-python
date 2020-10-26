@@ -107,27 +107,36 @@ def f_g_p1(hour,minute):
 
 # 建立串口连接对象
 def connect_uart(modbus_set,baudrate=9600,timeout=1):
-    
-    try:
-        print("modbus_set is :",modbus_set)
-        i = 0
-        inst = []
-        for key,value in modbus_set.items():
-            inst.append(minimalmodbus.Instrument(key,value))
-            print("inst is :",inst[0])
-            inst[i].serial.baudrate = baudrate
+    # RS485连接重试功能和连接超时功能的UART连接
+    conn_status = True
+    max_retries_count = 10  # 设置最大重试次数
+    conn_retries_count = 0  # 初始重试次数
+    conn_timeout = 3  # 连接超时时间为3秒
+    while conn_status and conn_retries_count <= max_retries_count:
+        try:
+            print("连接RS485设备中..",modbus_set)
+            i = 0
+            inst = []
+            for key,value in modbus_set.items():
+                inst.append(minimalmodbus.Instrument(key,value))
+                print("inst is :",inst[0])
+                inst[i].serial.baudrate = baudrate
 
-            inst[i].serial.timeout = timeout
+                inst[i].serial.timeout = timeout
+                
+                lt_impep[value]=(inst[i].read_float(4126,3,2,byteorder=0))*120
+                print(lt_impep)
+                i = i+1
+            conn_status = False  # 如果RS485连接成功则conn_status为设置为False则退出循环，返回inst列表连接对象
+            return inst
             
-            lt_impep[value]=(inst[i].read_float(4126,3,2,byteorder=0))*120
-            print(lt_impep)
-            i = i+1
-        
-        return inst
-        
-    except Exception:
-        print("values is:",key,value)
-        print(traceback.format_exc())
+        except:
+            conn_retries_count += 1
+            print(conn_retries_count)
+
+        print('connect uart is error!!')
+        time.sleep(conn_timeout) # test result!
+        continue
 
 # 设备数据读取，并返回字典，key 为设备 ，value 为 返回数据列表
 def data_read(inst):
