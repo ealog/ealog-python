@@ -49,6 +49,7 @@ ip_addr ="10.10.100.100"
 
 # 定义读取/写入json参数文件，当第一启动读取JSON文件内的，
 def json_rw(rw):
+    global lt_impep
     if rw == 'r':
         try:
             with open(json_file,'r') as f:
@@ -124,8 +125,8 @@ def connect_uart(modbus_set,baudrate=9600,timeout=1):
 
                 inst[i].serial.timeout = timeout
                 
-                lt_impep[value]=(inst[i].read_float(4126,3,2,byteorder=0))*120
-                print(lt_impep)
+                # lt_impep[value]=(inst[i].read_float(4126,3,2,byteorder=0))*120
+                # print(lt_impep)
                 i = i+1
             conn_status = False  # 如果RS485连接成功则conn_status为设置为False则退出循环，返回inst列表连接对象
             return inst
@@ -133,9 +134,8 @@ def connect_uart(modbus_set,baudrate=9600,timeout=1):
         except:
             conn_retries_count += 1
             print(conn_retries_count)
-
-        print('connect uart is error!!')
-        time.sleep(conn_timeout) # test result!
+            print('connect uart is error!!')
+            time.sleep(conn_timeout) # test result!
         continue
 
 # 设备数据读取，并返回字典，key 为设备 ，value 为 返回数据列表
@@ -237,9 +237,9 @@ def data_read(inst):
     print("Q3Eq is :"+str(Q3Eq))
     print("Q4Eq is :"+str(Q4Eq))
     print("Meter_addr is :"+str(meter_addr))
-    print('lt_impep',lt_impep[meter_addr])
+    print('lt_impep',lt_impep[str(meter_addr)])
     print('ImpEp:',ImpEp)
-    ImpEp_increase = ImpEp - lt_impep[meter_addr]
+    ImpEp_increase = ImpEp - lt_impep[str(meter_addr)]
     print('ImpEp_increase:',ImpEp_increase)
     # 写入数据库字段值列表
     data_list = []
@@ -257,6 +257,7 @@ def data_read(inst):
     return meter_data
 
 def data_write(database_inst,uart_data):
+    print(lt_impep)
     try:    
 
         for key,value in uart_data.items():
@@ -268,8 +269,8 @@ def data_write(database_inst,uart_data):
             database_inst['conn'].commit()
             
             print("uart_data values :",uart_data)
-            lt_impep[key] = uart_data[key][0][27]
-            print(lt_impep[key])
+            lt_impep[str(key)] = uart_data[key][0][27]
+            print(lt_impep[str(key)])
 
         # 写完数据后，休眠时间。
         time_now=datetime.datetime.now()
@@ -350,6 +351,7 @@ def connect_database():
     
 def main():
     json_rw('r')
+    print(lt_impep)
     uart_inst = connect_uart(modbus_set)
     database_inst = connect_database()
     while True:
