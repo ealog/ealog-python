@@ -113,14 +113,16 @@ def connect_uart(modbus_set,baudrate=9600,timeout=1):
     max_retries_count = 10  # 设置最大重试次数
     conn_retries_count = 0  # 初始重试次数
     conn_timeout = 3  # 连接超时时间为3秒
+    i = 0
+    inst = []
     while conn_status and conn_retries_count <= max_retries_count:
         try:
             print("连接RS485设备中..",modbus_set)
-            i = 0
-            inst = []
+            
+            
             for key,value in modbus_set.items():
                 inst.append(minimalmodbus.Instrument(key,value))
-                print("inst is :",inst[0])
+                print("inst is :",inst[i])
                 inst[i].serial.baudrate = baudrate
 
                 inst[i].serial.timeout = timeout
@@ -128,6 +130,7 @@ def connect_uart(modbus_set,baudrate=9600,timeout=1):
                 # lt_impep[value]=(inst[i].read_float(4126,3,2,byteorder=0))*120
                 # print(lt_impep)
                 i = i+1
+            print("已连接设备为： ",inst)
             conn_status = False  # 如果RS485连接成功则conn_status为设置为False则退出循环，返回inst列表连接对象
             return inst
             
@@ -252,7 +255,7 @@ def data_read(inst):
     
 
     meter_data = {meter_addr:data_list}
-
+    print("线程数据为： ",meter_data)
 
     return meter_data
 
@@ -350,9 +353,11 @@ def connect_database():
         time.sleep(sleep_time)        
     
 def main():
+    global uart_date
     json_rw('r')
     print(lt_impep)
     uart_inst = connect_uart(modbus_set)
+    # print("实例数量为： ",len(uart_inst))
     database_inst = connect_database()
     while True:
         threads = []
@@ -373,7 +378,7 @@ def main():
 
         for i in threads_len:
             uart_data=threads[i].get_result()
-
+        print("最终电表数据为： ",uart_data)
         sleep_time = data_write(database_inst,uart_data)
         time.sleep(sleep_time)
 

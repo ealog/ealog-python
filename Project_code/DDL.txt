@@ -1,0 +1,113 @@
+CREATE TABLE `meters` (
+  `meter_id` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `meter_name` varchar(20) NOT NULL,
+  `meter_model` varchar(20) DEFAULT NULL,
+  `meter_addr` varchar(20) NOT NULL,
+  `area` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `category` varchar(5) NOT NULL,
+  PRIMARY KEY (`meter_id`,`meter_addr`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('1', 'CHNT', 'DTSU666', '1', 'A', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('10', 'CHNT', 'DTSU666', '10', 'J', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('11', 'CHNT', 'DTSU666', '11', 'K', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('12', 'CHNT', 'DTSU666', '12', 'L', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('2', 'CHNT', 'DTSU666', '2', 'B', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('3', 'CHNT', 'DTSU666', '3', 'C', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('4', 'CHNT', 'DTSU666', '4', 'D', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('5', 'CHNT', 'DTSU666', '5', 'E', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('6', 'CHNT', 'DTSU666', '6', 'F', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('7', 'CHNT', 'DTSU666', '7', 'G', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('8', 'CHNT', 'DTSU666', '8', 'H', '');
+INSERT INTO prod_energy.meters
+(meter_id, meter_name, meter_model, meter_addr, area, category)
+VALUES('9', 'CHNT', 'DTSU666', '9', 'I', '');
+
+
+
+
+
+
+CREATE TABLE `meters_data` (
+  `auto_id` int NOT NULL AUTO_INCREMENT,
+  `meter_addr` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `get_date_time` datetime NOT NULL,
+  `get_date` date DEFAULT NULL,
+  `year_quarter` varchar(6) DEFAULT NULL,
+  `week_count` varchar(2) DEFAULT NULL,
+  `day_week` varchar(1) DEFAULT NULL,
+  `cur_year` int NOT NULL,
+  `cur_month` int NOT NULL,
+  `cur_day` int NOT NULL,
+  `cur_hour` int NOT NULL,
+  `cur_minute` int NOT NULL,
+  `H_L_M` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `Ua` float NOT NULL,
+  `Ub` float NOT NULL,
+  `Uc` float NOT NULL,
+  `Ia` float NOT NULL,
+  `Ib` float NOT NULL,
+  `Ic` float NOT NULL,
+  `Pt` float NOT NULL,
+  `Pa` float NOT NULL,
+  `Pb` float NOT NULL,
+  `Pc` float NOT NULL,
+  `PFt` float NOT NULL,
+  `PFa` float NOT NULL,
+  `PFb` float NOT NULL,
+  `PFc` float NOT NULL,
+  `Freq` float NOT NULL,
+  `ImpEp` float NOT NULL,
+  `ImpEp_increase` float NOT NULL,
+  `ExpEp` float NOT NULL,
+  `Q1Eq` float NOT NULL,
+  `Q2Eq` float NOT NULL,
+  `Q3Eq` float NOT NULL,
+  `Q4Eq` float NOT NULL,
+  `time_stamp` datetime DEFAULT NULL,
+  PRIMARY KEY (`auto_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+
+CREATE TABLE `power_price` (
+  `price_id` varchar(3) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `H_L_M` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `price` double NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+
+
+INSERT INTO prod_energy.power_price
+(price_id, H_L_M, price)
+VALUES('1', '峰', 0.812325);
+INSERT INTO prod_energy.power_price
+(price_id, H_L_M, price)
+VALUES('2', '谷', 0.54155);
+INSERT INTO prod_energy.power_price
+(price_id, H_L_M, price)
+VALUES('3', '平', 0.270775);
+
