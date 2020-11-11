@@ -13,6 +13,14 @@ import threading
 
 import json
 
+import configparser
+
+conf=configparser.ConfigParser()
+
+conf.read('config.ini')
+
+
+
 
 json_file = 'lt_impep.json'
 
@@ -21,17 +29,17 @@ sleep_time = 0
 
 # 定义MODBUS设备链接串口及设备地址\baudrate\timeout， key 代表COM口，values 代表设备地址
 
-modbus_set={'COM2':1}
+modbus_set=conf.get('METER_INIT','modbus_set')
 
-baudrate = 9600
+baudrate = conf.get('METER_INIT','baudrate')
 
-timeout = 1
+timeout = conf.get('METER_INIT','timeout')
 
 # 此条定义无意义，使用字典，定义每个设备的上次数据 key 代表设备地址 values 存储设备上次数据uart_inst
 lt_impep={}
 
 # 使用字典，存储设备返回数据
-uart_date={}
+uart_data={}
 
 # 定义暂停间隔
 SEC = 0.1
@@ -45,7 +53,7 @@ P=[6,7,12,13,14,15,22]
 SQL = "insert into meters_data (meter_addr,get_date_time,get_date,year_quarter,week_count,day_week,cur_year,cur_month,cur_day,cur_hour,cur_minute,H_L_M,Ua,Ub,Uc,Ia,Ib,Ic,Pt,Pa,Pb,Pc,PFt,PFa,PFb,PFc,Freq,ImpEp,ImpEp_increase,ExpEp,Q1Eq,Q2Eq,Q3Eq,Q4Eq,time_stamp) values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now())"
 SQL1 = "select ImpEp from meters_data order by get_date_time desc limit 1"
 # 定义数据库IP地址
-ip_addr ="10.10.100.100"
+ip_addr =conf.get('DATABASE_IP','ip_addr')
 
 # 定义读取/写入json参数文件，当第一启动读取JSON文件内的，
 def json_rw(rw):
@@ -353,7 +361,7 @@ def connect_database():
         time.sleep(sleep_time)        
     
 def main():
-    global uart_date
+    global uart_data
     json_rw('r')
     print(lt_impep)
     uart_inst = connect_uart(modbus_set)
@@ -377,7 +385,8 @@ def main():
             threads[i].join()
 
         for i in threads_len:
-            uart_data=threads[i].get_result()
+            uart_data.update(threads[i].get_result())
+
         print("最终电表数据为： ",uart_data)
         sleep_time = data_write(database_inst,uart_data)
         time.sleep(sleep_time)
