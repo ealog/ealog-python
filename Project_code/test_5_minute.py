@@ -17,9 +17,9 @@ import configparser
 
 conf=configparser.ConfigParser()
 
-conf.read('config.ini')
+conf.read('config.ini',encoding='utf-8')
 
-
+config_dic = conf._sections
 
 
 json_file = 'lt_impep.json'
@@ -29,11 +29,11 @@ sleep_time = 0
 
 # 定义MODBUS设备链接串口及设备地址\baudrate\timeout， key 代表COM口，values 代表设备地址
 
-modbus_set=conf.get('METER_INIT','modbus_set')
+modbus_set = config_dic['METER_PORT_ADDR']
 
-baudrate = conf.get('METER_INIT','baudrate')
+baudrate = conf.getint('METER_INIT','baudrate')
 
-timeout = conf.get('METER_INIT','timeout')
+timeout = conf.getint('METER_INIT','timeout')
 
 # 此条定义无意义，使用字典，定义每个设备的上次数据 key 代表设备地址 values 存储设备上次数据uart_inst
 lt_impep={}
@@ -129,7 +129,7 @@ def connect_uart(modbus_set,baudrate=9600,timeout=1):
             
             
             for key,value in modbus_set.items():
-                inst.append(minimalmodbus.Instrument(key,value))
+                inst.append(minimalmodbus.Instrument(key,int(value)))
                 print("inst is :",inst[i])
                 inst[i].serial.baudrate = baudrate
 
