@@ -398,24 +398,43 @@ def main():
     # print("实例数量为： ",len(uart_inst))
     database_inst = connect_database()
     while True:
-        threads = []
+        try:
+            threads = []
 
-        threads_len = range(len(uart_inst))
+            threads_len = range(len(uart_inst))
 
-        print("threads_len values are:",threads_len)
+            print("threads_len values are:",threads_len)
+            
+            for i in threads_len:
+                t = MyThread(data_read,args=(uart_inst[i],))
+                threads.append(t)
+
+            for i in threads_len:
+                threads[i].start()
+            
+            for i in threads_len:
+                threads[i].join()
+
+            for i in threads_len:
+            
+                uart_data.update(threads[i].get_result())
+        except:
+                message = MIMEText("错误", 'plain', 'utf-8')
+                message['From'] = Header("菜鸟教程", 'utf-8')
+                message['To'] =  Header("测试", 'utf-8')
+                        
+                subject = '设备读取错误！'
+                message['Subject'] = Header(subject, 'utf-8')
         
-        for i in threads_len:
-            t = MyThread(data_read,args=(uart_inst[i],))
-            threads.append(t)
-
-        for i in threads_len:
-            threads[i].start()
         
-        for i in threads_len:
-            threads[i].join()
-
-        for i in threads_len:
-            uart_data.update(threads[i].get_result())
+                try:
+                    smtpObj = smtplib.SMTP() 
+                    smtpObj.connect(mail_host, 25)    # 25 为 SMTP 端口号
+                    smtpObj.login(mail_user,mail_pass)  
+                    smtpObj.sendmail(sender, receivers, message.as_string())
+                    print ("邮件发送成功")
+                except smtplib.SMTPException:
+                    print ("Error: 无法发送邮件")       
 
         print("最终电表数据为： ",uart_data)
         sleep_time = data_write(database_inst,uart_data)
