@@ -15,6 +15,12 @@ import json
 
 import configparser
 
+import smtplib
+
+from email.mime.text import MIMEText
+
+from email.header import Header
+
 conf=configparser.ConfigParser()
 
 conf.read('config.ini',encoding='utf-8')
@@ -34,6 +40,10 @@ modbus_set = config_dic['METER_PORT_ADDR']
 baudrate = conf.getint('METER_INIT','baudrate')
 
 timeout = conf.getint('METER_INIT','timeout')
+
+# 定义发生读取错误时，发送邮件至那个邮箱地址
+
+email_addr = 
 
 # 此条定义无意义，使用字典，定义每个设备的上次数据 key 代表设备地址 values 存储设备上次数据uart_inst
 lt_impep={}
